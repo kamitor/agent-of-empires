@@ -11,7 +11,8 @@ if [ ! -f "$PREBUILT_BIN" ]; then
 fi
 
 mkdir -p "$TARGET_DIR"
-cp "$PREBUILT_BIN" "$TARGET_DIR/aoe"
+cp "$PREBUILT_BIN" "$TARGET_DIR/aoe.new"
+mv -f "$TARGET_DIR/aoe.new" "$TARGET_DIR/aoe"
 chmod +x "$TARGET_DIR/aoe"
 
 echo "Successfully installed aoe to $TARGET_DIR/aoe"

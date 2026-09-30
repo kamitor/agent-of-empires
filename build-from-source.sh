@@ -10,7 +10,8 @@ echo "Building agent-of-empires with Antigravity CLI support..."
 cargo build --release
 
 mkdir -p "$TARGET_DIR"
-cp "$SCRIPT_DIR/target/release/aoe" "$TARGET_DIR/aoe"
+cp "$SCRIPT_DIR/target/release/aoe" "$TARGET_DIR/aoe.new"
+mv -f "$TARGET_DIR/aoe.new" "$TARGET_DIR/aoe"
 chmod +x "$TARGET_DIR/aoe"
 
 echo "Successfully built and installed aoe to $TARGET_DIR/aoe"
