@@ -833,10 +833,14 @@ mod tests {
     }
 
     #[test]
-    fn test_get_tool_command_gemini() {
+    fn test_get_tool_command_agy() {
         let mut inst = Instance::new("test", "/tmp/test");
+        inst.tool = "agy".to_string();
+        assert_eq!(inst.get_tool_command(), "agy");
+
+        // Alias "gemini" also resolves to agy binary
         inst.tool = "gemini".to_string();
-        assert_eq!(inst.get_tool_command(), "gemini");
+        assert_eq!(inst.get_tool_command(), "agy");
     }
 
     #[test]

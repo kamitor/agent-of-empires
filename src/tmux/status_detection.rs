@@ -482,7 +482,7 @@ pub fn detect_pi_status(raw_content: &str) -> Status {
     Status::Idle
 }
 
-pub fn detect_gemini_status(raw_content: &str) -> Status {
+pub fn detect_antigravity_status(raw_content: &str) -> Status {
     let content = raw_content.to_lowercase();
     let lines: Vec<&str> = content.lines().collect();
     let non_empty_lines: Vec<&str> = lines
@@ -501,7 +501,7 @@ pub fn detect_gemini_status(raw_content: &str) -> Status {
         .join("\n");
     let last_lines_lower = last_lines.to_lowercase();
 
-    // RUNNING: Gemini shows activity indicators
+    // RUNNING: Shows activity indicators
     if last_lines_lower.contains("esc to interrupt")
         || last_lines_lower.contains("ctrl+c to interrupt")
     {
@@ -541,6 +541,11 @@ pub fn detect_gemini_status(raw_content: &str) -> Status {
     }
 
     Status::Idle
+}
+
+#[allow(dead_code)]
+pub fn detect_gemini_status(raw_content: &str) -> Status {
+    detect_antigravity_status(raw_content)
 }
 
 #[cfg(test)]
@@ -703,6 +708,42 @@ mod tests {
     fn test_detect_codex_status_idle() {
         assert_eq!(detect_codex_status("file saved"), Status::Idle);
         assert_eq!(detect_codex_status("random output text"), Status::Idle);
+    }
+
+    #[test]
+    fn test_detect_antigravity_status_running() {
+        assert_eq!(
+            detect_antigravity_status("processing request\nesc to interrupt"),
+            Status::Running
+        );
+        assert_eq!(detect_antigravity_status("generating ⠋"), Status::Running);
+        assert_eq!(detect_antigravity_status("working ⠹"), Status::Running);
+    }
+
+    #[test]
+    fn test_detect_antigravity_status_waiting() {
+        assert_eq!(
+            detect_antigravity_status("run this command? (y/n)"),
+            Status::Waiting
+        );
+        assert_eq!(
+            detect_antigravity_status("approve changes?"),
+            Status::Waiting
+        );
+        assert_eq!(
+            detect_antigravity_status("execute this action? [y/n]"),
+            Status::Waiting
+        );
+        assert_eq!(detect_antigravity_status("ready\n>"), Status::Waiting);
+    }
+
+    #[test]
+    fn test_detect_antigravity_status_idle() {
+        assert_eq!(detect_antigravity_status("file saved"), Status::Idle);
+        assert_eq!(
+            detect_antigravity_status("random output text"),
+            Status::Idle
+        );
     }
 
     #[test]

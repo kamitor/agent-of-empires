@@ -118,15 +118,15 @@ pub const AGENTS: &[AgentDef] = &[
         hook_config: None,
     },
     AgentDef {
-        name: "gemini",
-        binary: "gemini",
-        aliases: &[],
-        detection: DetectionMethod::Which("gemini"),
-        yolo: Some(YoloMode::CliFlag("--approval-mode yolo")),
+        name: "agy",
+        binary: "agy",
+        aliases: &["antigravity", "gemini"],
+        detection: DetectionMethod::Which("agy"),
+        yolo: Some(YoloMode::CliFlag("--dangerously-skip-permissions")),
         instruction_flag: None,
         set_default_command: false,
         supports_host_launch: true,
-        detect_status: status_detection::detect_gemini_status,
+        detect_status: status_detection::detect_antigravity_status,
         container_env: &[],
         hook_config: None,
     },
@@ -174,9 +174,11 @@ pub const AGENTS: &[AgentDef] = &[
     },
 ];
 
-/// Look up an agent by canonical name.
+/// Look up an agent by canonical name or alias.
 pub fn get_agent(name: &str) -> Option<&'static AgentDef> {
-    AGENTS.iter().find(|a| a.name == name)
+    AGENTS
+        .iter()
+        .find(|a| a.name == name || a.aliases.contains(&name))
 }
 
 /// All canonical agent names in registry order.
@@ -209,7 +211,7 @@ pub fn settings_index_from_name(name: Option<&str>) -> usize {
     match name {
         Some(n) => AGENTS
             .iter()
-            .position(|a| a.name == n)
+            .position(|a| a.name == n || a.aliases.contains(&n))
             .map(|i| i + 1)
             .unwrap_or(0),
         None => 0,
@@ -235,7 +237,9 @@ mod tests {
         assert_eq!(get_agent("opencode").unwrap().binary, "opencode");
         assert_eq!(get_agent("vibe").unwrap().binary, "vibe");
         assert_eq!(get_agent("codex").unwrap().binary, "codex");
-        assert_eq!(get_agent("gemini").unwrap().binary, "gemini");
+        assert_eq!(get_agent("agy").unwrap().binary, "agy");
+        assert_eq!(get_agent("antigravity").unwrap().binary, "agy");
+        assert_eq!(get_agent("gemini").unwrap().binary, "agy");
         assert_eq!(get_agent("cursor").unwrap().binary, "agent");
         assert_eq!(get_agent("copilot").unwrap().binary, "copilot");
         assert_eq!(get_agent("pi").unwrap().binary, "pi");
@@ -251,7 +255,7 @@ mod tests {
         let names = agent_names();
         assert_eq!(
             names,
-            vec!["claude", "opencode", "vibe", "codex", "gemini", "cursor", "copilot", "pi"]
+            vec!["claude", "opencode", "vibe", "codex", "agy", "cursor", "copilot", "pi"]
         );
     }
 
@@ -261,7 +265,9 @@ mod tests {
         assert_eq!(resolve_tool_name("open-code"), Some("opencode"));
         assert_eq!(resolve_tool_name("mistral-vibe"), Some("vibe"));
         assert_eq!(resolve_tool_name("codex"), Some("codex"));
-        assert_eq!(resolve_tool_name("gemini"), Some("gemini"));
+        assert_eq!(resolve_tool_name("agy"), Some("agy"));
+        assert_eq!(resolve_tool_name("antigravity"), Some("agy"));
+        assert_eq!(resolve_tool_name("gemini"), Some("agy"));
         assert_eq!(resolve_tool_name("cursor"), Some("cursor"));
         assert_eq!(resolve_tool_name("github-copilot"), Some("copilot"));
         assert_eq!(resolve_tool_name("copilot"), Some("copilot"));
@@ -275,14 +281,16 @@ mod tests {
     fn test_settings_index_roundtrip() {
         assert_eq!(settings_index_from_name(None), 0);
         assert_eq!(settings_index_from_name(Some("claude")), 1);
+        assert_eq!(settings_index_from_name(Some("agy")), 5);
         assert_eq!(settings_index_from_name(Some("gemini")), 5);
+        assert_eq!(settings_index_from_name(Some("antigravity")), 5);
         assert_eq!(settings_index_from_name(Some("cursor")), 6);
         assert_eq!(settings_index_from_name(Some("copilot")), 7);
         assert_eq!(settings_index_from_name(Some("pi")), 8);
 
         assert_eq!(name_from_settings_index(0), None);
         assert_eq!(name_from_settings_index(1), Some("claude"));
-        assert_eq!(name_from_settings_index(5), Some("gemini"));
+        assert_eq!(name_from_settings_index(5), Some("agy"));
         assert_eq!(name_from_settings_index(6), Some("cursor"));
         assert_eq!(name_from_settings_index(7), Some("copilot"));
         assert_eq!(name_from_settings_index(8), Some("pi"));

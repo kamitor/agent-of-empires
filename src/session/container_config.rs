@@ -92,7 +92,7 @@ const AGENT_CONFIG_MOUNTS: &[AgentConfigMount] = &[
         preserve_files: &[],
     },
     AgentConfigMount {
-        tool_name: "gemini",
+        tool_name: "agy",
         host_rel: ".gemini",
         container_suffix: ".gemini",
         skip_entries: &["sandbox"],
@@ -608,8 +608,9 @@ pub(crate) fn build_container_config(
 
     // Sync host agent config into a shared sandbox directory per agent and
     // bind-mount it read-write. Only mount the config for the active tool.
-    // Agent definitions are in AGENT_CONFIG_MOUNTS -- add new agents there, not here.
-    for mount in AGENT_CONFIG_MOUNTS.iter().filter(|m| m.tool_name == tool) {
+    for mount in AGENT_CONFIG_MOUNTS.iter().filter(|m| {
+        m.tool_name == tool || crate::agents::get_agent(tool).is_some_and(|a| a.name == m.tool_name)
+    }) {
         let container_path = format!("{}/{}", CONTAINER_HOME, mount.container_suffix);
 
         let sandbox_dir = match prepare_sandbox_dir(mount, &home) {
