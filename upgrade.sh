@@ -54,12 +54,18 @@ fi
 
 echo "✓ aoe version:   $($TARGET_BIN --version 2>/dev/null || echo 'Installed')"
 
-# 4. Check Antigravity CLI (agy)
+# 4. Check Antigravity CLI (agy), auto-install if missing
 if which agy >/dev/null 2>&1; then
     echo "✓ Antigravity CLI (agy): found at $(which agy)"
 else
     echo "⚠️  Antigravity CLI (agy) not found in PATH."
-    echo "   Make sure agy is installed and accessible."
+    echo "Installing Antigravity CLI (agy)..."
+    if curl -fsSL https://antigravity.google/cli/install.sh | bash; then
+        echo "✓ Antigravity CLI installed successfully!"
+    else
+        echo "❌ Failed to install Antigravity CLI automatically."
+        echo "   Please run: curl -fsSL https://antigravity.google/cli/install.sh | bash"
+    fi
 fi
 
 echo ""
