@@ -68,6 +68,17 @@ else
     fi
 fi
 
+# 5. Link antigravity-awesome-skills if present in NextCloud
+AWESOME_SKILLS="$HOME/Documents/NextCloud/Github/antigravity-awesome-skills/skills"
+if [ -d "$AWESOME_SKILLS" ]; then
+    echo ""
+    echo "Linking Antigravity Awesome Skills..."
+    mkdir -p "$HOME/.gemini/config"
+    ln -sfn "$AWESOME_SKILLS" "$HOME/.gemini/skills"
+    ln -sfn "$AWESOME_SKILLS" "$HOME/.gemini/config/skills"
+    echo "✓ Linked 1,400+ skills from NextCloud to ~/.gemini/skills and ~/.gemini/config/skills"
+fi
+
 echo ""
 echo "========================================="
 echo " Upgrade Complete!                       "
